@@ -27,3 +27,7 @@ class Node:
 
     def get_item (self, itemId):
         return db.Node.find_one({"_id": itemId})
+
+
+    def query (self, query):
+        return self.db.Node.find(query)
