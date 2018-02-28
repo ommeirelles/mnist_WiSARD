@@ -1,16 +1,14 @@
 # from src.discriminator import *
-from src.node import *
+from src.profile import *
 from src.read_file import * 
 from config import config
-from models.profile import *
-from models.discriminator import *
 
 if __name__ == "__main__":
     ##Using the MNIST Handwrite dataset http://yann.lecun.com/exdb/mnist/
-    imagesTrainingFile = 'C:/Users/omoreira/Downloads/train-images.idx3-ubyte'
-    labelsTrainingFile = '/Users/omoreira/Downloads/train-labels.idx1-ubyte'
-    imagesTestFile = '/Users/omoreira/Downloads/t10k-images.idx3-ubyte'
-    labelsTestFile = '/Users/omoreira/Downloads/t10k-labels.idx1-ubyte'
+    imagesTrainingFile = '/Users/otaviomeirelles/Downloads/train-images-idx3-ubyte'
+    labelsTrainingFile = '/Users/otaviomeirelles/Downloads/train-labels-idx1-ubyte'
+    imagesTestFile = '/Users/otaviomeirelles/Downloads/t10k-images-idx3-ubyte'
+    labelsTestFile = '/Users/otaviomeirelles/Downloads/t10k-labels-idx1-ubyte'
 
     # imgHeight, imgWidth = (28, 28) ##784 posições.
     # Training Images Array with labels
@@ -44,32 +42,26 @@ if __name__ == "__main__":
 
 
 
+    connection = pymongo.MongoClient(config["host"], config["port"])[config["database"]]
     '''
         It is 60.000 training images and 10.000 test images of 28x28 pixels of hadwrite numbers from 1-9
         I will train 4 profiles whihc each discriminators will have 196, 98, 56 and 49 nodes respectively.
     '''
-
-    profiles = Profile(config).query({})
-    if profiles.count() == 0:
-        Profile(config).insert_many([{
-            "nodes": 196,
-            "description": "each node has 4 random positions from image"
-        }, {
-            "nodes": 98,
-            "description": "each node has 8 random positions from image"
-        }, {
-            "nodes": 56,
-            "description": "each node has 14 random positions from image"
-        }, {
-            "nodes": 49,
-            "description": "each node has 16 random positions from image"
-        }]);
-
-    profiles = Profile(config).query({})
+    profiles = []
+    for i in [{
+        "nodes": 196,
+        "description": "each node has 4 random positions from image"
+    }, {
+        "nodes": 98,
+        "description": "each node has 8 random positions from image"
+    }, {
+        "nodes": 56,
+        "description": "each node has 14 random positions from image"
+    }, {
+        "nodes": 49,
+        "description": "each node has 16 random positions from image"
+    }]:
+        profiles.append(Profile(i["nodes"], i["description"], connection))
     for p in profiles:
-        for i in range(9):
-            Discriminator(config).insert({
-                "label": str(i),
-                "numberOfNodes": p["nodes"]
-            })
-            # discriminators.append(Discriminator(p["nodes"], 784, str(i)))
+        p.addDiscriminators([str(i) for i in range(9)])
+    print('asfsafas')

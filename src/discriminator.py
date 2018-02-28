@@ -1,10 +1,21 @@
+import pymongo
 from node import *
 import random
 
 class Discriminator():
-    def __init__(self, nodes, inputSize, label):
+    def __init__(self, nodes, inputSize, label, profileId, conn):
         self.label = label
+        self.profileId = profileId
+        self.conn = conn
+        self.collection = conn["Discriminator"]
         self.nodes = []
+
+        self.id = self.collection.insert_one({
+            "nodes": self.nodes,
+            "label": self.label,
+            "profileId": self.profileId
+        }, True).inserted_id
+
         taken = []
         for i in range(nodes):
             positions = []
